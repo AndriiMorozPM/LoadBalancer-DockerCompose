@@ -1,0 +1,43 @@
+version: "3"
+services:
+       nodetest1:
+           container_name: nodetest1
+           image: nodetest:alpha
+           restart: always
+           build: ./TestNodeApp/
+           ports:
+             - "8081:8083"
+           environment:
+             - "port_d=8081"
+           links:
+             - mongo
+
+       nodetest2:
+           container_name: nodetest2
+           image: nodetest:alpha
+           restart: always
+           build: ./TestNodeApp/
+           ports:
+             - "8082:8083"
+           environment:
+             - "port_d=8082"
+           links:
+             - mongo
+
+       loadbalancer:
+           container_name: loadbalancer
+           image: loadbalancer:alpha3
+           restart: always
+           build: ./LoadBalancer/
+           ports:
+             - "8083:80"
+           links:
+             - nodetest1
+             - nodetest2
+
+       mongo:
+             container_name: mongo
+             image: mongo:4.4.18
+
+             volumes:
+               - ./data:/data/db
